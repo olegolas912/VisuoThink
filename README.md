@@ -1,8 +1,11 @@
 
 # VisuoThink: Empowering LVLM Reasoning with Multimodal Tree Search
 
+[Code](https://github.com/ekonwang/VisuoThink) | [Paper](assets/pdf_VisuoThink.pdf)
+
 Recent advancements in Large Vision-Language Models have showcased remarkable capabilities. However, they often falter when confronted with complex reasoning tasks that humans typically address through visual aids and deliberate, step-by-step thinking. While existing methods have explored text-based slow thinking or rudimentary visual assistance, they fall short of capturing the intricate, interleaved nature of human visual-verbal reasoning processes. To overcome these limitations and inspired by the mechanisms of slow thinking in human cognition, we introduce **VisuoThink**, a novel framework that seamlessly integrates visuospatial and linguistic domains. **VisuoThink** facilitates multimodal slow thinking by enabling progressive visual-textual reasoning and incorporates test-time scaling through look-ahead tree search. Extensive experiments demonstrate that **VisuoThink** significantly enhances reasoning capabilities via inference-time scaling, even without fine-tuning, achieving state-of-the-art performance in tasks involving geometry and spatial reasoning.
 
+<!-- ![](./assets/visuothink.png) -->
 ![](./assets/visuothink.png)
 
 ## Quick Start
@@ -12,7 +15,7 @@ Recent advancements in Large Vision-Language Models have showcased remarkable ca
 pip install -r requirements.txt
 ```
 
-2. Set up the `config.py` file under `visual-navigation/config.py`:
+2. Set up the `config.py` file under `visual-navigation/` as follows:
 
 ```python
 import os
@@ -28,6 +31,9 @@ API_KEY = os.environ.get("OPENAI_API_KEY")
 
 llm_config={"cache_seed": None, "config_list": [{"model": MODEL_NAME, "temperature": 0.0, "api_key": API_KEY}]}
 ```
+
+3. Run the visual navigation tasks:
+![](./assets/spatial_reasoning.png)
 
 - To run the visual navigation with VisuoThink, you can use the following command:
 
