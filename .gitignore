@@ -1,0 +1,28 @@
+*pycache*/
+__pycache__/
+
+**output**
+**output**/
+
+.DS_Store
+.DS_Store/
+
+node_modules/
+
+*.sh
+*.temp*
+*.log*
+*.zip
+*.tar 
+*.tar.gz
+*.gz
+*.txt
+*.sh
+*.json
+
+config.py
+
+*.ipynb
+
+# temporary files
+# scripts/
