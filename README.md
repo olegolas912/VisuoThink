@@ -62,10 +62,13 @@ python visual-navigation/run_task_nav.py --verbose --visual --run_tag cot
 ## Citation
 Please consider citing our paper and starring this repo if you find them helpful. Thank you!
 ```bibtex
-@article{wang2025visuothink,
-         title={VisuoThink: Empowering LVLM Reasoning with Multimodal Tree Search},
-         author={Yikun Wang, Siyin Wang, etl.},
-         journal={https://github.com/ekonwang/VisuoThink},
-         year={2025}
+@misc{wang2025visuothinkempoweringlvlmreasoning,
+      title={VisuoThink: Empowering LVLM Reasoning with Multimodal Tree Search}, 
+      author={Yikun Wang and Siyin Wang and Qinyuan Cheng and Zhaoye Fei and Liang Ding and Qipeng Guo and Dacheng Tao and Xipeng Qiu},
+      year={2025},
+      eprint={2504.09130},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2504.09130}, 
 }
 ```
