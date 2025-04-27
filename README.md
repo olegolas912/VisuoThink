@@ -1,8 +1,12 @@
 
 # VisuoThink: Empowering LVLM Reasoning with Multimodal Tree Search
 
-<div align="center">
+<!-- <div align="center">
 [💻 Code](https://github.com/ekonwang/VisuoThink) | [📃 Paper](https://arxiv.org/abs/2504.09130) | [🤗](https://huggingface.co/papers/2504.09130)
+</div> -->
+
+<div align="center">
+<a href="https://github.com/ekonwang/VisuoThink">💻 Code</a> | <a href="https://arxiv.org/abs/2504.09130">📃 Paper</a> | <a href="https://huggingface.co/papers/2504.09130">🤗 Hugging Face</a>
 </div>
 
 Recent advancements in Large Vision-Language Models have showcased remarkable capabilities. However, they often falter when confronted with complex reasoning tasks that humans typically address through visual aids and deliberate, step-by-step thinking. While existing methods have explored text-based slow thinking or rudimentary visual assistance, they fall short of capturing the intricate, interleaved nature of human visual-verbal reasoning processes. To overcome these limitations and inspired by the mechanisms of slow thinking in human cognition, we introduce **VisuoThink**, a novel framework that seamlessly integrates visuospatial and linguistic domains. **VisuoThink** facilitates multimodal slow thinking by enabling progressive visual-textual reasoning and incorporates test-time scaling through look-ahead tree search. Extensive experiments demonstrate that **VisuoThink** significantly enhances reasoning capabilities via inference-time scaling, even without fine-tuning, achieving state-of-the-art performance in tasks involving geometry and spatial reasoning.
