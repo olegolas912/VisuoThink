@@ -54,10 +54,17 @@ python visual-navigation/run_task_nav.py --verbose
 python visual-navigation/run_task_nav.py --verbose --visual --run_tag cot
 ```
 
+- To run the **geometry** tasks with VisuoThink (/wo rollout search), you can use the following command:
+
+```bash
+python geometry/solver.py
+```
+
+
 ## Benchmarks
 
-- Visual Tiling and Geometry (Geometry3k & Geomverse)'s Google Drive links will be available soon.
-
+<!-- - Visual Tiling and Geometry (Geometry3k & Geomverse)'s Google Drive links will be available soon. -->
+- (4.27 News) Geomverse Dataset has been released! See [here](dataset/geometry/Dataset_GeomVerse) for more details.
 
 ## Citation
 Please consider citing our paper and starring this repo if you find them helpful. Thank you!

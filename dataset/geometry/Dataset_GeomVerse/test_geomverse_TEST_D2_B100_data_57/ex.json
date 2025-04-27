@@ -1,0 +1,12 @@
+{
+    "problem_text": "This is a GeomVerse problem. If the area of the ABC sector is 157 and the area of the cyan semi-circle is 100.48, compute the degree of the CBA angle. Assume $\\pi=3.14$. Round computations to 2 decimal places.",
+    "code": "\nimport matplotlib.pyplot as plt\nimport matplotlib.patches as patches\nimport numpy as np\n\n# Coordinates\nA = (15095.12, 5423.099999999999)\nB = (34.23, 34.23)\nC = (34.23, 16030.169999999998)\n\n# Create figure and axis\nfig, ax = plt.subplots(figsize=(8, 8))\n\n# Draw the orange semicircle (B, A, C)\nradius = 16030.173826794913\nstart_angle = np.degrees(np.arctan2(A[1] - B[1], A[0] - B[0]))\nend_angle = np.degrees(np.arctan2(C[1] - B[1], C[0] - B[0]))\n\nif start_angle > end_angle:\n    end_angle += 360\n\norange_arc = patches.Wedge(\n    center=B,\n    r=radius,\n    theta1=start_angle,\n    theta2=end_angle,\n    facecolor=\"orange\",\n    edgecolor=\"black\",\n    alpha=0.6\n)\nax.add_patch(orange_arc)\n\n# Draw the cyan semicircle (C, B)\ncyan_arc = patches.Wedge(\n    center=B,\n    r=radius,\n    theta1=90,\n    theta2=180,\n    facecolor=\"cyan\",\n    edgecolor=\"black\",\n    alpha=0.6\n)\nax.add_patch(cyan_arc)\n\n# Add labels\nax.text(A[0], A[1], \"A\", fontsize=16, ha=\"left\", va=\"bottom\")\nax.text(B[0], B[1], \"B\", fontsize=16, ha=\"right\", va=\"top\")\nax.text(C[0], C[1], \"C\", fontsize=16, ha=\"right\", va=\"bottom\")\n\n# Configure the plot\nax.set_xlim(-19965.77, 20034.23)\nax.set_ylim(-4965.77, 25034.23)\nax.set_aspect(\"equal\")\nax.axis(\"off\")\n\n# Show the plot\nplt.show()\n",
+    "image_path_code": "test_geomverse_TEST_D2_B100_data_57/111.png",
+    "logic_form": {
+        "diagram_logic_form": null
+    },
+    "ext_info": {
+        "label": "72.0",
+        "cot": "The area of the cyan semi-circle is 100.48 so the length of the BC diameter can be computed as $\\sqrt{\\frac{8 * 100.48}{\\pi}} = \\sqrt{\\frac{803.84}{3.14}} = \\sqrt{256.0} = 16$. The BC radius of the ABC sector is 16 and the area is 157. So the CBA angle can be computed as $\\frac{area}{\\pi * r^2} * 360 = \\frac{157}{\\pi * 16^2} * 360 = \\frac{157}{803.84} * 360 = 0.2 * 360 = 72$. Therefore the final answer is 72."
+    }
+}

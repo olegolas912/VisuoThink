@@ -1,0 +1,12 @@
+{
+    "problem_text": "This is a GeomVerse problem. If the length of the height perpendicular to the AB base in the ABE triangle is 11, the area of the ABE triangle is 100 and the area of the blue semi-circle is 100.48, compute the perimeter of the ABCD parallelogram. Assume $\\pi=3.14$. Round computations to 2 decimal places.",
+    "code": "\nimport matplotlib.pyplot as plt\nimport matplotlib.patches as patches\nimport numpy as np\n\n# Coordinates\nA = (34.23, 34.23)\nB = (16512.55, 7718.2)\nC = (16512.55, 23714.14)\nD = (34.23, 16030.169999999998)\nE = (15720.759999999998, -3117.42)\n\n# Create figure and axis\nfig, ax = plt.subplots(figsize=(10, 10))\n\n# Draw the cyan quadrilateral (A, B, C, D)\ncyan_polygon = patches.Polygon([A, B, C, D], closed=True, color=\"cyan\", alpha=0.6)\nax.add_patch(cyan_polygon)\n\n# Draw the green triangle (A, B, E)\ngreen_triangle = patches.Polygon([A, B, E], closed=True, color=\"green\", alpha=0.6)\nax.add_patch(green_triangle)\n\n# Draw the blue semicircle\narc_radius = 7.997971913397457\narc = patches.Wedge(center=D, r=arc_radius, theta1=90, theta2=270, color=\"blue\", alpha=0.6)\nax.add_patch(arc)\n\n# Add labels\nax.text(A[0], A[1], \"A\", fontsize=16, ha=\"right\", va=\"top\")\nax.text(B[0], B[1], \"B\", fontsize=16, ha=\"left\", va=\"bottom\")\nax.text(C[0], C[1], \"C\", fontsize=16, ha=\"left\", va=\"bottom\")\nax.text(D[0], D[1], \"D\", fontsize=16, ha=\"right\", va=\"bottom\")\nax.text(E[0], E[1], \"E\", fontsize=16, ha=\"left\", va=\"top\")\n\n# Configure the plot\nax.set_xlim(-9965.77, 30034.23)\nax.set_ylim(-9965.77, 30034.23)\nax.set_aspect(\"equal\")\nax.axis(\"off\")\n\n# Show the plot\nplt.show()\n",
+    "image_path_code": "test_geomverse_TEST_D2_B100_data_25/206.png",
+    "logic_form": {
+        "diagram_logic_form": null
+    },
+    "ext_info": {
+        "label": "68.36",
+        "cot": "For the ABE triangle, the length of the height perpendicular to the AB base is 11 and the area is 100 so the length of the AB base is $\\frac{2 * 100}{11} = \\frac{200}{11} = 18.18$. The area of the blue semi-circle is 100.48 so the length of the AD diameter can be computed as $\\sqrt{\\frac{8 * 100.48}{\\pi}} = \\sqrt{\\frac{803.84}{3.14}} = \\sqrt{256.0} = 16$. The lengths of the AD and the AB sides of the ABCD parallelogram are 16 and 18.18, so the perimeter of the ABCD parallelogram is $2 * (16 + 18.18) = 2 * 34.18 = 68.36$. Therefore the final answer is 68.36."
+    }
+}
