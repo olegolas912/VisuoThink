@@ -7,7 +7,9 @@ reportlab
 pilmoji==2.0.4
 emoji==1.7.0
 matplotlib
-websocket
+# websocket
+websocket-client
+flaml[automl]
 
 # -- sandbox dependencies -- #
 jupyter_client==8.6.3

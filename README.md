@@ -18,6 +18,9 @@ Recent advancements in Large Vision-Language Models have showcased remarkable ca
 
 1. Install the dependencies:
 ```bash
+conda create -n visuothink python==3.10 -y
+conda activate visuothink
+
 pip install -r requirements.txt
 ```
 
