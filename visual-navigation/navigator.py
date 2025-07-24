@@ -5,11 +5,11 @@ import re
 
 from agent import VisualNavigationUserAgent
 
-try:
-    from prompt import VisualNavigationPrompt, VisualNavigationCoT, VisualNavigationVoT
-    from execution import VisiualNavigationExecutor
-except:
-    print("Visual Navigation is not supported.")
+# try:
+from prompt import VisualNavigationPrompt, VisualNavigationCoT, VisualNavigationVoT
+from execution import VisiualNavigationExecutor
+# except:
+#     print("Visual Navigation is not supported.")
 
 try:
     from prompt import VisualTilingPrompt

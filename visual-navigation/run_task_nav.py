@@ -19,6 +19,8 @@ def run_agent(tasks_path="dataset/visual-navigation/configurations/level-3", tas
     print(tasks_path)
     all_task_instances = glob.glob(f"{tasks_path}/*")
 
+    assert len(all_task_instances) > 0, f"No task instances found in {tasks_path}, please run the script under the `VisuoThink`."
+
     assert visual_tag in ['cot', 'vot', None]
     if visual_tag in ['cot', 'vot']:
         pass
