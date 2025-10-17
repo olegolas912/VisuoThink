@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 import argparse, shutil
+from pathlib import Path
 
 from agent import GeoProUserAgent
 from prompt import GeoPromptVisuoThink
@@ -12,8 +14,13 @@ from utils_llm import chat_vlm
 from tqdm import tqdm
 from copy import deepcopy
 
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_CONFIG_DIR = _PROJECT_ROOT / "visual-navigation"
+if str(_CONFIG_DIR) not in sys.path:
+    sys.path.insert(0, str(_CONFIG_DIR))
+
 # the max reasoning steps / tree search depth
-from config import MAX_REPLY
+from config import MAX_REPLY  # noqa: E402
 
 
 def aux_step(task_type: str) -> bool:

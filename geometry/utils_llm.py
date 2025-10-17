@@ -2,15 +2,20 @@ import json
 import os
 import sys
 from datetime import datetime
-from autogen.agentchat.contrib.img_utils import (
-    gpt4v_formatter,
-)
-from autogen.oai.client import OpenAIWrapper
-from config import llm_config
-from utils_misc import print_error
+from pathlib import Path
 from time import sleep
 from copy import deepcopy
+
+from autogen.agentchat.contrib.img_utils import gpt4v_formatter
+from autogen.oai.client import OpenAIWrapper
 from utils_misc import print_error
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_CONFIG_DIR = _PROJECT_ROOT / "visual-navigation"
+if str(_CONFIG_DIR) not in sys.path:
+    sys.path.insert(0, str(_CONFIG_DIR))
+
+from config import llm_config  # noqa: E402
 
 TOKEN_G = 0
 TOKEN_USED = 0

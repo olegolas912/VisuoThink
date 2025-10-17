@@ -1,12 +1,17 @@
 import json
 import os
 import sys
+from pathlib import Path
 
-from autogen.agentchat.contrib.img_utils import (
-    gpt4v_formatter,
-)
+from autogen.agentchat.contrib.img_utils import gpt4v_formatter
 from autogen.oai.client import OpenAIWrapper
-from config import llm_config
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[1]
+_CONFIG_DIR = _PROJECT_ROOT / "visual-navigation"
+if str(_CONFIG_DIR) not in sys.path:
+    sys.path.insert(0, str(_CONFIG_DIR))
+
+from config import llm_config  # noqa: E402
 
 def chat_gpt4o(prompt: str, history_messages = None):
     if history_messages is None:
