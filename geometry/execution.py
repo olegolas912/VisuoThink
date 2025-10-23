@@ -1,7 +1,12 @@
 import os, sys
 import pickle
-from autogen.coding import CodeBlock
-from autogen.coding.jupyter import JupyterCodeExecutor, LocalJupyterServer
+import platform
+from autogen.coding import CodeBlock, LocalCommandLineCodeExecutor
+try:
+    from autogen.coding.jupyter import JupyterCodeExecutor, LocalJupyterServer
+    JUPYTER_AVAILABLE = True
+except ImportError:
+    JUPYTER_AVAILABLE = False
 import ast, re
 
 # add the tools directory to the path
@@ -19,23 +24,30 @@ class CodeExecutor:
         ):
         self.working_dir = working_dir
         self.use_vision_tools = use_vision_tools
-        # set up the server
-        self.server = LocalJupyterServer()
+        self.is_windows = platform.system() == "Windows"
+        self.server = None
         
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir, exist_ok=True)
             
+        print(f"   [INFO] Using {'LocalCommandLine' if self.is_windows else 'Jupyter'} code executor")
         self._restart()
     
 
     def _restart(self):
         self.cleanup()
 
-        # set up the server
-        self.server = LocalJupyterServer()
-            
-        # set up the jupyter executor
-        self.executor = JupyterCodeExecutor(self.server, output_dir=self.working_dir)
+        # set up the executor based on platform
+        if self.is_windows:
+            # Use LocalCommandLine on Windows (Python subprocess-based execution)
+            self.executor = LocalCommandLineCodeExecutor(
+                timeout=60,
+                work_dir=self.working_dir
+            )
+        else:
+            # Use Jupyter on Linux/Mac
+            self.server = LocalJupyterServer()
+            self.executor = JupyterCodeExecutor(self.server, output_dir=self.working_dir)
 
         # initialize the environment
         self.init_env(self.use_vision_tools)
@@ -76,7 +88,8 @@ class CodeExecutor:
         
         exit_code = result.exit_code
         
-        file_paths = result.output_files
+        # Handle different result types (Jupyter vs CommandLine)
+        file_paths = getattr(result, 'output_files', [])
         output_str = result.output
         output_lines = output_str.split("\n")
         
@@ -111,7 +124,10 @@ class CodeExecutor:
             return exit_code, error_msg, file_paths
     
     def execute(self, code: str, init_env: bool = False):
-        self.executor._jupyter_kernel_client = self.executor._jupyter_client.get_kernel_client(self.executor._kernel_id)
+        # For Jupyter executor, refresh the kernel client
+        if hasattr(self.executor, '_jupyter_kernel_client'):
+            self.executor._jupyter_kernel_client = self.executor._jupyter_client.get_kernel_client(self.executor._kernel_id)
+        
         execution_result = self.executor.execute_code_blocks(
             code_blocks=[
                 CodeBlock(language="python",
@@ -124,18 +140,24 @@ class CodeExecutor:
         return ret
     
     def init_env(self, use_vision_tools):
-        init_code = ("import sys\n"
-                     "from PIL import Image\n"
-                     "from IPython.display import display\n"
-                     f"parent_dir = '{parent_dir}'\n"
-                     "if parent_dir not in sys.path:\n"
-                     "    sys.path.insert(0, parent_dir)\n"
-                     "from tools_geo import *\n"
-                     "import math\n"
-        )
+        # Build initialization code based on executor type
+        init_code = "import sys\n"
+        init_code += "from PIL import Image\n"
+        
+        # Only import IPython.display for Jupyter executor (not CommandLine)
+        if not self.is_windows:
+            init_code += "from IPython.display import display\n"
+        
+        init_code += f"parent_dir = '{parent_dir}'\n"
+        init_code += "if parent_dir not in sys.path:\n"
+        init_code += "    sys.path.insert(0, parent_dir)\n"
+        init_code += "from tools_geo import *\n"
+        init_code += "import math\n"
+        
         init_resp = self.execute(init_code, init_env=True)
         print(init_resp[1])
 
 
     def cleanup(self):
-        self.server.stop()
+        if self.server is not None:
+            self.server.stop()
