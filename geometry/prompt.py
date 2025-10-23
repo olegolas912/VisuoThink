@@ -68,7 +68,7 @@ from tools_geo import *
 For instance, If the length of the side opposite to the shared side is provided, we have already known the length of equilateral triangle's side length. Then we call `equation = primeter_of_rectangle_with_equilateral_triangle(length_of_shared_side=known_length, length_of_other_side='x', result=known_primeter)`.
 Otherwise, if we don't know the length of the side opposite to the shared side, but we know the length of the other side, then we call `equation = primeter_of_rectangle_with_equilateral_triangle(length_of_shared_side='x', length_of_other_side=known_length, result=known_primeter)`.
 
-# USER REQUEST #: Given the geometry diagram <img src='dataset/test_geomverse/test_geomverse_TEST_D2_B100_data_1/1.png'> and the matplotlib code of the geometry:
+# USER REQUEST #: Given the geometry diagram <img src='dataset/Dataset_GeomVerse/test_geomverse_TEST_D2_B100_data_1/1.png'> and the matplotlib code of the geometry:
 ```python
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
