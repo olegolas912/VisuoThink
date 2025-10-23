@@ -305,24 +305,60 @@ class HuggingFaceChatClient:
                 attn_impl = "sdpa"
             model_kwargs["attn_implementation"] = attn_impl
 
-        try:
-            model = self._AutoModelForCausalLM.from_pretrained(
-                self._settings.model_id,
-                **model_kwargs,
-            )
-        except Exception as primary_exc:
+        # Add retry logic for network issues
+        max_retries = 3
+        retry_delay = 5  # seconds
+        model = None
+        primary_exc = None
+        
+        for attempt in range(max_retries):
             try:
-                from transformers import AutoModelForVision2Seq
-
-                model = AutoModelForVision2Seq.from_pretrained(
+                model = self._AutoModelForCausalLM.from_pretrained(
                     self._settings.model_id,
                     **model_kwargs,
                 )
+                break  # Success, exit retry loop
+            except Exception as e:
+                primary_exc = e
+                if "Failed to resolve" in str(e) or "timeout" in str(e).lower():
+                    if attempt < max_retries - 1:
+                        logger.warning(f"Network error (attempt {attempt + 1}/{max_retries}): {e}")
+                        logger.info(f"Retrying in {retry_delay} seconds...")
+                        import time
+                        time.sleep(retry_delay)
+                        retry_delay *= 2  # Exponential backoff
+                        continue
+                # If not network error or max retries reached, try vision models
+                break
+        
+        # If AutoModelForCausalLM failed, try vision models
+        if model is None:
+            try:
+                # Try newer AutoModelForImageTextToText (transformers >= 4.45)
+                try:
+                    from transformers import AutoModelForImageTextToText
+                    model = AutoModelForImageTextToText.from_pretrained(
+                        self._settings.model_id,
+                        **model_kwargs,
+                    )
+                except ImportError:
+                    # Fall back to AutoModelForVision2Seq (older transformers)
+                    from transformers import AutoModelForVision2Seq
+                    model = AutoModelForVision2Seq.from_pretrained(
+                        self._settings.model_id,
+                        **model_kwargs,
+                    )
             except Exception as secondary_exc:
                 raise RuntimeError(
                     f"Unable to load Hugging Face model '{self._settings.model_id}'. "
-                    f"Tried AutoModelForCausalLM and AutoModelForVision2Seq. "
-                    f"Errors: {primary_exc} | {secondary_exc}"
+                    f"Tried AutoModelForCausalLM, AutoModelForImageTextToText, and AutoModelForVision2Seq. "
+                    f"\nPrimary error: {primary_exc}"
+                    f"\nSecondary error: {secondary_exc}"
+                    f"\n\nSuggestions:"
+                    f"\n1. Check internet connectivity"
+                    f"\n2. Ensure sufficient disk space (model needs ~4GB)"
+                    f"\n3. Try a smaller model: HF_MODEL_ID=microsoft/phi-2"
+                    f"\n4. Check firewall/proxy settings"
                 ) from secondary_exc
 
         model.eval()

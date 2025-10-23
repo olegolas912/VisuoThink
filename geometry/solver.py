@@ -69,19 +69,46 @@ def run_geo_task(task_input: str, output_dir: str, task_type: str, verbose: bool
             # load the images
             query['image_path_code'] = os.path.join(output_dir, query['image_path_code'])
             print(f"\n[IMAGE PATH]")
-            print(f"   {query['image_path_code']}")
+            print(f"   Original: {query['image_path_code']}")
             print(f"   Image exists: {os.path.exists(query['image_path_code'])}")
             
-            # Check ATR status
+            # Check ATR status and apply preprocessing if enabled
             print(f"\n[CHECKING ATR (Adaptive Token Reduction) STATUS]")
             atr_enable = os.environ.get("ATR_ENABLE", "false").lower() in ("1", "true", "yes")
             if atr_enable:
                 print(f"   [+] ATR ENABLED")
-                print(f"   Retention: {os.environ.get('ATR_RETENTION', '0.3')}")
-                print(f"   Crop: {os.environ.get('ATR_CROP', 'false')}")
-                print(f"   [!] NOTE: ATR preprocessing not implemented in this solver version!")
+                retention = float(os.environ.get('ATR_RETENTION', '0.3'))
+                crop_mode = os.environ.get('ATR_CROP', 'false').lower() in ("1", "true", "yes")
+                strategy = os.environ.get('ATR_STRATEGY', 'combined')
+                visualize = os.environ.get('ATR_VISUALIZE', 'false').lower() in ("1", "true", "yes")
+                
+                print(f"   Retention: {retention*100:.0f}%")
+                print(f"   Strategy: {strategy}")
+                print(f"   Crop mode: {crop_mode}")
+                print(f"   Visualization: {visualize}")
+                
+                try:
+                    from atr_integration import apply_atr_preprocessing
+                    print(f"   [APPLYING ATR...]")
+                    
+                    processed_path = apply_atr_preprocessing(
+                        image_path=query['image_path_code'],
+                        retention=retention,
+                        crop=crop_mode,
+                        strategy=strategy,
+                        visualize=visualize,
+                    )
+                    
+                    # Update query to use processed image
+                    query['image_path_code'] = processed_path
+                    print(f"   [✓] ATR preprocessing complete")
+                    print(f"   Processed image: {processed_path}")
+                    
+                except Exception as e:
+                    print(f"   [!] ATR preprocessing failed: {e}")
+                    print(f"   [!] Falling back to original image")
             else:
-                print(f"   [-] ATR DISABLED (use enhanced_solver.py for ATR support)")
+                print(f"   [-] ATR DISABLED")
             
             images = []
             print(f"\n[INITIALIZING COMPONENTS]")
