@@ -8,7 +8,10 @@ from typing import Dict, List, Tuple
 import torch
 from PIL import Image
 
-from .utils_misc import print_error
+try:
+    from .utils_misc import print_error  # type: ignore
+except ImportError:  # when executed as a script (no package context)
+    from utils_misc import print_error  # type: ignore
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _GEOMETRY_DIR = Path(__file__).resolve().parent
@@ -22,6 +25,7 @@ from config import (  # noqa: E402
     HF_MAX_NEW_TOKENS,
     HF_MODEL_ID,
     HF_REPETITION_PENALTY,
+    HF_SYSTEM_PROMPT,
     HF_TEMPERATURE,
     HF_TOP_P,
     HF_TRUST_REMOTE_CODE,
@@ -60,6 +64,15 @@ def _resolve_image_path(path_str: str) -> Path:
         _PROJECT_ROOT / path,
         Path(_PROJECT_ROOT / "geometry") / path,
     ]
+    # Handle dataset paths that omit the "geometry" prefix.
+    if path_str.startswith("dataset/"):
+        relative = path
+        try:
+            relative = path.relative_to("dataset")
+        except ValueError:
+            relative = path
+        candidates.append(_PROJECT_ROOT / "dataset" / "geometry" / relative)
+
     for candidate in candidates:
         if candidate.exists():
             return candidate
@@ -105,7 +118,7 @@ def _ensure_model():
         trust_remote_code=HF_TRUST_REMOTE_CODE,
     )
     load_kwargs: Dict[str, object] = {
-        "torch_dtype": torch_dtype,
+        "dtype": torch_dtype,
         "trust_remote_code": HF_TRUST_REMOTE_CODE,
     }
     if use_cuda:
@@ -165,7 +178,11 @@ def _generate_with_qwen(clean_messages: List[Dict[str, str]], temperature: float
     _ensure_model()
     assert _processor is not None and _model is not None  # for type checkers
 
-    formatted_messages, images = _content_to_messages(clean_messages)
+    working_messages = clean_messages
+    if HF_SYSTEM_PROMPT and (not working_messages or working_messages[0].get("role") != "system"):
+        working_messages = [{"role": "system", "content": HF_SYSTEM_PROMPT}] + working_messages
+
+    formatted_messages, images = _content_to_messages(working_messages)
     chat_text = _processor.apply_chat_template(
         formatted_messages,
         tokenize=False,
