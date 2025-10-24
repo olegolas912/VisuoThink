@@ -32,7 +32,7 @@ from config import (  # noqa: E402
 )
 
 try:
-    from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
+    from transformers import AutoProcessor, Qwen2VLForConditionalGeneration, Qwen3VLForConditionalGeneration, AutoModelForImageTextToText, LlavaForConditionalGeneration
 except Exception as exc:  # pragma: no cover - handled at runtime
     AutoProcessor = None  # type: ignore
     Qwen2VLForConditionalGeneration = None  # type: ignore

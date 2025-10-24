@@ -2,6 +2,7 @@ import os
 import json
 import argparse
 from pathlib import Path
+from transformers import Qwen3VLForConditionalGeneration, AutoProcessor
 
 # ==========================
 # Configuration (edit here)
@@ -34,6 +35,14 @@ PROFILES = {
         "MODE": "qwen_vl",
         "MODEL": "Qwen/Qwen2-VL-7B-Instruct",
     },
+    "qwen3_vl_4b": {
+        "MODE": "qwen3_vl", 
+        "MODEL": "Qwen/Qwen3-VL-30B-A3B-Instruct"
+    }, 
+    "qwen3_vl_4b_qa": {
+        "MODE": "qwen3_vl_qa", 
+        "MODEL": "Kate-03/Qwen3-VL-4B-Geo170k"
+    }, 
 }
 
 def _merge_config_with_args():
@@ -135,6 +144,10 @@ def main():
         "question": question,
         "image": str(image_path),
     }
+    try:
+        print(cfg["MODE"])
+    except Exception as e:
+        print(e)
 
     if cfg["MODE"] == "pipeline_vqa":
         vqa = pipeline("visual-question-answering", model=cfg["MODEL"], device=device)
@@ -144,7 +157,7 @@ def main():
             "answer": result[0]["answer"] if isinstance(result, list) and result else None,
             "score": result[0].get("score") if isinstance(result, list) and result else None,
         })
-    else:
+    elif cfg["MODE"] in ["qwen2vl_2b", "qwen2vl_7b"]:
         # Qwen2-VL instruct flow: prompt the model to output only a number in degrees
         model_id = cfg["MODEL"]
         dtype = torch.float16 if torch.cuda.is_available() else torch.float32
@@ -188,6 +201,54 @@ def main():
             "answer": answer,
             "score": None,
         })
+    elif cfg["MODE"] in ["qwen3_vl", "qwen3_vl_qa"]:
+
+        model_id = cfg["MODEL"]
+        dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+        device_str = "cuda" if torch.cuda.is_available() else "cpu"
+
+        processor = AutoProcessor.from_pretrained(model_id)
+
+        model = Qwen3VLForConditionalGeneration.from_pretrained(
+            "Qwen/Qwen3-VL-4B-Instruct", dtype="auto", device_map="auto"
+        )
+
+        sys_prompt = (
+            "You are a geometry expert. Given an image and a question, "
+            "compute the angle asked in degrees. Respond with only a single number "
+            "rounded to 2 decimal places, without any words or symbols."
+        )
+        user_text = (
+            question
+            + "\n\nIMPORTANT: Output only a single number (degrees), rounded to 2 decimals."
+        )
+        image = Image.open(image_path).convert("RGB")
+        messages = [
+            {"role": "system", "content": sys_prompt},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": image},
+                    {"type": "text", "text": f"<image> {user_text}"},
+                ],
+            },
+        ]
+
+        text = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        print(text)
+        inputs = processor(text=[text], images=[image], return_tensors="pt")
+        inputs = {k: v.to(device_str) for k, v in inputs.items()}
+        with torch.no_grad():
+            out = model.generate(**inputs, max_new_tokens=64, do_sample=False)
+        gen = processor.batch_decode(out, skip_special_tokens=True)[0]
+        # Extract only new generation by splitting on prompt tail if available
+        answer = gen.split(user_text)[-1].strip()
+        pred.update({
+            "raw_output": gen,
+            "answer": answer,
+            "score": None,
+        })
+
 
     out_dir = Path(cfg["OUT_DIR"]) / sample_dir.name
     out_dir.mkdir(parents=True, exist_ok=True)
