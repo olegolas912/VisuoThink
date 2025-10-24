@@ -14,6 +14,8 @@ from utils_llm import chat_vlm
 from tqdm import tqdm
 from copy import deepcopy
 
+from config import HF_MODEL_ID
+
 _PROJECT_ROOT = Path(__file__).resolve().parents[1]
 _CONFIG_DIR = _PROJECT_ROOT / "visual-navigation"
 if str(_CONFIG_DIR) not in sys.path:
@@ -89,6 +91,11 @@ def run_geo_task(task_input: str, output_dir: str, task_type: str, verbose: bool
 
 
 if __name__ == "__main__":
-    TASK_DIR = "dataset/geometry/Dataset_GeomVerse/test_geomverse_TEST_D2_B100_data_1"
-    OUTPUT_DIR = "outputs/geometry/Dataset_GeomVerse/test_geomverse_TEST_D2_B100_data_1"
-    run_geo_task(TASK_DIR, OUTPUT_DIR, task_type="visuothink", verbose=True)
+    path  = "dataset/geometry/Dataset_GeomVerse/"
+    for task in tqdm(os.listdir(path)):
+        TASK_DIR = f"dataset/geometry/Dataset_GeomVerse/{task}"
+        OUTPUT_DIR = f"outputs/geometry/{HF_MODEL_ID}/{task}"
+        run_geo_task(TASK_DIR, OUTPUT_DIR, task_type="visuothink", verbose=True)
+    # TASK_DIR = "dataset/geometry/Dataset_GeomVerse/test_geomverse_TEST_D2_B100_data_1"
+    # OUTPUT_DIR = "outputs/geometry/Dataset_GeomVerse/test_geomverse_TEST_D2_B100_data_1"
+    # run_geo_task(TASK_DIR, OUTPUT_DIR, task_type="visuothink", verbose=True)
